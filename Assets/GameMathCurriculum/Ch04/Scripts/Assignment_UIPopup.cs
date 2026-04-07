@@ -108,7 +108,7 @@ public class Assignment_UIPopup : MonoBehaviour
         {
             float easedT = EaseOut(t);
             popupPanel.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, easedT);
-            canvasGroup.alpha = Mathf.Lerp(0f, 1f, t);
+            canvasGroup.alpha = Mathf.Lerp(0f, 1f, easedT);
 
             if (t >= 1f)
             {
@@ -121,7 +121,7 @@ public class Assignment_UIPopup : MonoBehaviour
         {
             float easedT = EaseIn(t);
             popupPanel.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, easedT);
-            canvasGroup.alpha = Mathf.Lerp(1f, 0f, t);
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, easedT);
 
             if (t >= 1f)
             {
@@ -134,12 +134,12 @@ public class Assignment_UIPopup : MonoBehaviour
 
     private float EaseOut(float t)
     {
-       return 1 - (1f - t) * (1f - t) ;
+       return 1f - (1f - t) * (1f - t); // EaseOutQuad: f(t) = 1 - (1 - t)^2
     }
 
     private float EaseIn(float t)
     {
-        return t * t;
+        return t * t; // EaseInQuad: f(t) = t^2
     }
 
     private void UpdateUI()

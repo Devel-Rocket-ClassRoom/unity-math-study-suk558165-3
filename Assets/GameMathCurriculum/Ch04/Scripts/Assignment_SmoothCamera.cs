@@ -76,26 +76,26 @@ public class Assignment_SmoothCamera : MonoBehaviour
         if (target == null) return;
 
         float scrollInput = Input.GetAxis("Mouse ScrollWheel"); 
-        if (scrollInput < 0f)
+        if (scrollInput < 0f) // 휠을 아래로 스크롤하면 줌 아웃
         {
-            targetZoomDistance += zoomSpeed; 
+            targetZoomDistance += zoomSpeed;  // 줌 아웃
         }
-        else if (scrollInput > 0f)
+        else if (scrollInput > 0f) // 휠을 위로 스크롤하면 줌 인
         {
             targetZoomDistance -= zoomSpeed; 
         }
-        targetZoomDistance = Mathf.Clamp(targetZoomDistance, minZoomDistance, maxZoomDistance);
+        targetZoomDistance = Mathf.Clamp(targetZoomDistance, minZoomDistance, maxZoomDistance); // 줌 거리 제한
 
-        currentZoomDistance = Mathf.SmoothDamp(currentZoomDistance, targetZoomDistance, ref zoomVelocity, zoomSmoothTime);
+        currentZoomDistance = Mathf.SmoothDamp(currentZoomDistance, targetZoomDistance, ref zoomVelocity, zoomSmoothTime); // SmoothDamp로 줌 거리 보간
 
         float baseDistance = offset.magnitude; // offset의 원래 길이
-        Vector3 desiredPos = target.position + offset * (currentZoomDistance / baseDistance);
-        transform.position = Vector3.SmoothDamp(transform.position, desiredPos, ref positionVelocity, positionSmoothTime);
-        Vector3 lookDirection = target.position - transform.position;
-        if (lookDirection != Vector3.zero)
+        Vector3 desiredPos = target.position + offset * (currentZoomDistance / baseDistance); // 타겟 위치에서 offset 방향으로 currentZoomDistance만큼 떨어진 위치 계산
+        transform.position = Vector3.SmoothDamp(transform.position, desiredPos, ref positionVelocity, positionSmoothTime); // SmoothDamp로 위치 보간
+        Vector3 lookDirection = target.position - transform.position; // 타겟을 바라보는 방향 계산
+        if (lookDirection != Vector3.zero) // 방향이 유효한 경우에만 회전
         {
-            Quaternion desiredRotation = Quaternion.LookRotation(lookDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, rotationSmoothSpeed * Time.deltaTime);
+            Quaternion desiredRotation = Quaternion.LookRotation(lookDirection); // 타겟을 바라보는 회전 계산
+            transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, rotationSmoothSpeed * Time.deltaTime); // Slerp로 회전 보간
         }
         UpdateUI();
     }

@@ -66,7 +66,6 @@ public class Assignment_EnemyDetector : MonoBehaviour
 
     private bool IsDetected(Transform enemy)
     {
-        // TODO
         Vector3 toTarget = enemy.position - transform.position;
         if (toTarget.magnitude > detectionRange)
         {

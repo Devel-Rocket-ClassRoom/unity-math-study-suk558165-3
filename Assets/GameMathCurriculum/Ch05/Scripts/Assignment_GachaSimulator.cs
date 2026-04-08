@@ -78,8 +78,8 @@ public class Assignment_GachaSimulator : MonoBehaviour
 
     private void PerformHardPityPulls()
     {
-       int pullsNeeded = hardPity - currentPityCount;
-        for (int i = 0; i < pullsNeeded; i++)
+       int pullsNeeded = hardPity - currentPityCount; // 천장까지 필요한 뽑기 횟수 계산
+        for (int i = 0; i < pullsNeeded; i++) // 필요한 횟수만큼 뽑기 실행
         {
             ExecutePull();
         }
@@ -90,11 +90,11 @@ public class Assignment_GachaSimulator : MonoBehaviour
         totalPulls++;
         currentPityCount++;
 
-        if (currentPityCount == hardPity)
+        if (currentPityCount == hardPity) // 천장 도달 시 확률 100%로 설정
         {
             currentEffectiveRate = 1f; // 천장 도달 시 100% 확률
         }
-        else if (currentPityCount >= softPityStart)
+        else if (currentPityCount >= softPityStart) // 소프트 피티 시작 이후부터 확률 상승
         {
             float pityProgress = (float)(currentPityCount - softPityStart) / (hardPity - softPityStart); // 천장까지의 진행도
             currentEffectiveRate = Mathf.Lerp(baseRate, 1f, pityProgress); // 선형 보간으로 확률 상승
@@ -104,7 +104,7 @@ public class Assignment_GachaSimulator : MonoBehaviour
         {
             currentEffectiveRate = baseRate; // 천장 시작 전에는 기본 확률
         }
-        if ( Random.value < currentEffectiveRate)
+        if ( Random.value < currentEffectiveRate) // SSR 획득 여부 결정
         {
             totalSSRs++;
             pullHistory.Add(true);
@@ -115,7 +115,7 @@ public class Assignment_GachaSimulator : MonoBehaviour
         {
             pullHistory.Add(false);
         }
-        if (pullHistory.Count > MAX_HISTORY)
+        if (pullHistory.Count > MAX_HISTORY) // 히스토리가 최대 개수를 초과하면 가장 오래된 기록 제거
         {
             pullHistory.RemoveAt(0);
         }

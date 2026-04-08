@@ -50,11 +50,11 @@ public class Assignment_PatrolGuard : MonoBehaviour
 
         Transform target = waypoints[currentWaypointIndex];
         Vector3 dirToNext = target.position - transform.position;
-        dirToNext.y = 0f;
-        dirToNext.Normalize();
-        distanceToNext = Vector3.Distance(transform.position, target.position);
+        dirToNext.y = 0f; // 수평면에서의 방향 벡터로 변환
+        dirToNext.Normalize(); // 목표 방향 벡터 계산 (수평면에서)
+        distanceToNext = Vector3.Distance(transform.position, target.position); // 다음 웨이포인트까지의 거리 계산
 
-    
+
         Quaternion beetweenPoint = Quaternion.FromToRotation(transform.forward, dirToNext); // 현재 forward와 목표 방향 사이의 회전 계산
         targetRotation = transform.rotation * beetweenPoint; // 목표 회전 = 현재 회전
 

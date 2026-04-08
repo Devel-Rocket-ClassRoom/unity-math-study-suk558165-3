@@ -44,11 +44,12 @@ public class Assignment_CircularFormation : MonoBehaviour
 
         for (int i = 0; i < units.Length; i++)
         {
-            if (units[i] == null) continue;
+            if (units[i] == null) 
+                continue;
 
             float angleforthisUnit = (360f / currentUnitCount) * i; // 유닛마다 고유한 배치 각도 계산
 
-            Quaternion slotRotation = Quaternion.AngleAxis(angleforthisUnit, Vector3.up); // 배치 회전: Y축 기준으로 각 유닛마다 다른 각도로 회전
+            Quaternion slotRotation = Quaternion.AngleAxis(angleforthisUnit, leader.up); // 배치 회전: Y축 기준으로 각 유닛마다 다른 각도로 회전
 
             Vector3 offset = leader.rotation * slotRotation * Vector3.forward * formationRadius; // 오프셋 계산: 리더 회전 * 배치 회전 * 앞 방향 * 반지름
             units[i].position = leader.position + offset; // 유닛 위치 = 리더 위치 + 오프셋
@@ -81,7 +82,7 @@ public class Assignment_CircularFormation : MonoBehaviour
         if (!Application.isPlaying || leader == null || units == null) return;
 
         // 원형 궤도 표시
-        VectorGizmoHelper.DrawCircleXZ(leader.position, formationRadius, new Color(0.3f, 1f, 0.3f, 0.3f));
+        //VectorGizmoHelper.DrawCircleXZ(leader.position, formationRadius, new Color(0.3f, 1f, 0.3f, 0.3f));
 
         for (int i = 0; i < units.Length; i++)
         {

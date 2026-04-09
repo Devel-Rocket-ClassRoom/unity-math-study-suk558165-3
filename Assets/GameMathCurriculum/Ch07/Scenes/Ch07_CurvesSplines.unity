@@ -581,7 +581,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &491921585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,10 +596,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BezierRandomMover
   startPoint: {x: -4, y: 5.45, z: 0.93}
   endPoint: {x: 4, y: 5.45, z: 2.3}
-  sphereCount: 5
+  sphereCount: 3
   minDuration: 1
   maxDuration: 3
-  randomRange: 5
+  randomRange: 3
 --- !u!4 &491921586
 Transform:
   m_ObjectHideFlags: 0
@@ -2113,6 +2113,14 @@ PrefabInstance:
       propertyPath: 'waypoints.Array.data[9]'
       value: 
       objectReference: {fileID: 1604883976}
+    - target: {fileID: 2041040197625500462, guid: 3c748a888c0e7d74dbb54d475cafca6b, type: 3}
+      propertyPath: speedCurve.m_Curve.Array.data[1].time
+      value: 0.4874878
+      objectReference: {fileID: 0}
+    - target: {fileID: 2041040197625500462, guid: 3c748a888c0e7d74dbb54d475cafca6b, type: 3}
+      propertyPath: speedCurve.m_Curve.Array.data[1].value
+      value: 0.9768982
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -38,7 +38,7 @@ public class Assignment_SplineConveyor : MonoBehaviour
         globalT += Time.deltaTime / cycleDuration * currentSpeedMultiplier; // 속도 배율을 적용하여 globalT 증가
         if (globalT > 1f) // globalT가 1을 초과하면 반복
         {
-           globalT = Mathf.Repeat(globalT, 1f); // 또는 globalT -= 1f; 도 가능
+           globalT = Mathf.Repeat(globalT, 1f); 
         }
         for (int i = 0; i < waypoints.Length; i++) // 각 박스의 위치 계산
         {
@@ -50,17 +50,17 @@ public class Assignment_SplineConveyor : MonoBehaviour
 
     private Vector3 EvaluateSpline(Transform[] pts, float t)
     {
-        int segmentCount = pts.Length - 1;
-        float scaledT = t * segmentCount;
-        int segment = Mathf.Clamp((int)scaledT, 0, segmentCount - 1);
-        float localT = scaledT - segment;
+        int segmentCount = pts.Length - 1; // 스플라인 구간 수 (웨이포인트 수 - 1)
+        float scaledT = t * segmentCount; // globalT(0~1)을 전체 구간 수로 스케일링
+        int segment = Mathf.Clamp((int)scaledT, 0, segmentCount - 1); // 현재 구간 인덱스 계산 (0 ~ segmentCount-1)
+        float localT = scaledT - segment; // 현재 구간 내에서의 t (0 ~ 1)
 
-        Vector3 p0 = pts[Mathf.Max(0, segment - 1)].position;
-        Vector3 p1 = pts[segment].position;
-        Vector3 p2 = pts[Mathf.Min(pts.Length - 1, segment + 1)].position;
-        Vector3 p3 = pts[Mathf.Min(pts.Length - 1, segment + 2)].position;
+        Vector3 p0 = pts[Mathf.Max(0, segment - 1)].position; // 이전 구간의 웨이포인트 (첫 번째 구간에서는 첫 번째 웨이포인트를 반복)
+        Vector3 p1 = pts[segment].position; // 현재 구간의 시작 웨이포인트
+        Vector3 p2 = pts[Mathf.Min(pts.Length - 1, segment + 1)].position; // 현재 구간의 끝 웨이포인트 (마지막 구간에서는 마지막 웨이포인트를 반복)
+        Vector3 p3 = pts[Mathf.Min(pts.Length - 1, segment + 2)].position; // 다음 구간의 웨이포인트 (마지막 구간에서는 마지막 웨이포인트를 반복)
 
-        return CatmullRom(p0, p1, p2, p3, localT);
+        return CatmullRom(p0, p1, p2, p3, localT); // Catmull-Rom 스플라인 계산
     }
 
     private Vector3 CatmullRom(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)

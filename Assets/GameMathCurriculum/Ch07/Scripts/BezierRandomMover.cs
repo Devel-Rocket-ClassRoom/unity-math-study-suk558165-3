@@ -19,7 +19,7 @@ public class BezierRandomMover : MonoBehaviour
         {
             SpawnSpheres();
         }
-        for (int i = movers.Count -1; i >= 0; i--)
+        for (int i = movers.Count - 1; i >= 0; i--)
         {
             var mover = movers[i]; // 튜플에서 값 꺼내기
             mover.t += Time.deltaTime / mover.duration; // t 증가 (0 ~ 1)
@@ -35,6 +35,7 @@ public class BezierRandomMover : MonoBehaviour
     }
     private void SpawnSpheres()
     {
+
         for (int i = 0; i < sphereCount; i++)
         {
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere); // 구체 생성
@@ -81,6 +82,7 @@ public class BezierRandomMover : MonoBehaviour
 
         return Vector3.Lerp(h, ii, t);
     }
+
 #if UNITY_EDITOR
     private void OnDrawGizmos() // 씬 뷰에서 곡선 경로 시각화
     {

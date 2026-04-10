@@ -2,23 +2,11 @@ using UnityEngine;
 
 public class DragAndDrop : MonoBehaviour
 {
-    [Header("=== 레이캐스트 설정 ===")]
     [Range(10f, 500f)]
     [SerializeField] private float maxRayDistance = 500f;
     [SerializeField] private string selectableTag = "Selectable";
-    [SerializeField] private string groundTag = "Ground";
-
-    [Header("=== 오브젝트 배치 ===")]
-    [SerializeField] private GameObject placePrefab;
     [Range(0f, 2f)]
     [SerializeField] private float placeOffsetY = 0.5f;
-
-    [Header("=== 시각화 색상 ===")]
-    [SerializeField] private Color colorSelected = Color.green;
-
-    private Ray lastRay;
-    private RaycastHit lastHit;
-    private bool isHitting;
 
     private Camera cam;
     private GameObject selectedObject;
@@ -28,6 +16,7 @@ public class DragAndDrop : MonoBehaviour
     private Vector3 originPosition;
     private bool isReturning;
     private Vector3 returnVelocity;
+    private Vector3 dragVelocity;
     private float currentY;
     private float yVelocity;
     private GameObject lastObject;
@@ -45,12 +34,32 @@ public class DragAndDrop : MonoBehaviour
     private void Update()
     {
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        lastRay = ray;
+
+        // 드래그 중
+        if (isDragging && selectedObject != null)
+        {
+            Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z = Vector3.Distance(cam.transform.position, originPosition);
+            Vector3 worldMousePosition = cam.ScreenToWorldPoint(mousePosition);
+
+            if (Physics.Raycast(selectedObject.transform.position + Vector3.up * 10f, Vector3.down, out RaycastHit groundHit, 1000f))
+            {
+                float targetY = groundHit.point.y + placeOffsetY;
+                currentY = Mathf.SmoothDamp(currentY, targetY, ref yVelocity, 0.8f);
+                worldMousePosition.y = currentY;
+            }
+            else
+                worldMousePosition.y = originPosition.y;
+
+            Vector3 targetPos = new Vector3(worldMousePosition.x, currentY, worldMousePosition.z);
+            selectedObject.transform.position = Vector3.SmoothDamp(
+                selectedObject.transform.position, targetPos, ref dragVelocity, 0.1f);
+        }
 
         // 복귀 중
         if (isReturning && selectedObject != null)
         {
-            if (Physics.Raycast(selectedObject.transform.position + Vector3.up * 10f, Vector3.down, out RaycastHit groundHit, 100f))
+            if (Physics.Raycast(selectedObject.transform.position + Vector3.up * 10f, Vector3.down, out RaycastHit groundHit, 1000f))
             {
                 float targetY = groundHit.point.y + placeOffsetY;
                 currentY = Mathf.SmoothDamp(currentY, targetY, ref yVelocity, 0.3f);
@@ -68,26 +77,6 @@ public class DragAndDrop : MonoBehaviour
                 lastObject = selectedObject;
                 isReturning = false;
             }
-        }
-
-        // 드래그 중
-        if (isDragging && selectedObject != null)
-        {
-            Vector3 mousePosition = Input.mousePosition;
-            mousePosition.z = Vector3.Distance(cam.transform.position, originPosition);
-            Vector3 worldMousePosition = cam.ScreenToWorldPoint(mousePosition);
-
-            // 위쪽에서 아래로 Raycast (오브젝트 위치 기준 위로 올려서 쏨)
-            if (Physics.Raycast(selectedObject.transform.position + Vector3.up * 10f, Vector3.down, out RaycastHit groundHit, 100f))
-            {
-                float targetY = groundHit.point.y + placeOffsetY;
-                currentY = Mathf.SmoothDamp(currentY, targetY, ref yVelocity, 0.3f);
-                worldMousePosition.y = currentY;
-            }
-            else
-                worldMousePosition.y = originPosition.y;
-
-            selectedObject.transform.position = worldMousePosition; // placeOffsetY 중복 제거
         }
 
         // 드롭 판정
@@ -117,43 +106,24 @@ public class DragAndDrop : MonoBehaviour
         // 클릭 감지
         if (Physics.Raycast(ray, out RaycastHit hit, maxRayDistance))
         {
-            lastHit = hit;
-            isHitting = true;
-
             if (Input.GetMouseButtonDown(0))
                 TrySelectObject(hit);
         }
-        else
-        {
-            isHitting = false;
-        }
-
-        // 복귀 완료 후 테라인 추적
-        if (!isDragging && !isReturning && lastObject != null)
-        {
-            if (Physics.Raycast(lastObject.transform.position + Vector3.up * 10f, Vector3.down, out RaycastHit groundHit, 1000f))
-            {
-                float targetY = groundHit.point.y + placeOffsetY;
-                currentY = Mathf.SmoothDamp(currentY, targetY, ref yVelocity, 0.3f);
-                lastObject.transform.position = new Vector3(
-                    lastObject.transform.position.x, currentY, lastObject.transform.position.z);
-            }
-        }
     }
 
-    private void TrySelectObject(RaycastHit hit)
+    private void TrySelectObject(RaycastHit hit) // 클릭한 오브젝트가 선택 가능한지 판정
     {
-        DeselectCurrent();
+        DeselectCurrent(); // 기존 선택 해제
 
-        if (hit.collider.CompareTag(selectableTag))
+        if (hit.collider.CompareTag(selectableTag)) // 선택 가능한 태그인지 체크
         {
-            selectedObject = hit.collider.gameObject;
-            currentY = selectedObject.transform.position.y;
-            selectedRenderer = selectedObject.GetComponent<Renderer>();
+            selectedObject = hit.collider.gameObject; // 선택된 오브젝트 저장
+            currentY = selectedObject.transform.position.y; //  현재 Y값 초기화
+            selectedRenderer = selectedObject.GetComponent<Renderer>(); // 렌더러 컴포넌트 가져오기
 
-            if (selectedRenderer != null)
+            if (selectedRenderer != null) // 렌더러가 있는 경우, 색상 변경하여 선택 표시
             {
-                selectedOriginalColor = selectedRenderer.material.color;
+                selectedOriginalColor = selectedRenderer.material.color; 
                 selectedRenderer.material.color = new Color(
                     selectedOriginalColor.r,
                     selectedOriginalColor.g,
@@ -162,9 +132,11 @@ public class DragAndDrop : MonoBehaviour
             }
 
             originPosition = selectedObject.transform.position;
+            if (Physics.Raycast(selectedObject.transform.position + Vector3.up * 10f, Vector3.down, out RaycastHit groundHit, 1000f))
+                originPosition.y = groundHit.point.y + placeOffsetY;
+
             isDragging = true;
             lastObject = null;
-            Debug.Log($"[DragAndDrop] 선택됨: {selectedObject.name}");
         }
     }
 

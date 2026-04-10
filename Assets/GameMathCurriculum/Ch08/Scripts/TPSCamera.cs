@@ -17,11 +17,7 @@ public class TPSCamera : MonoBehaviour
 
     [Tooltip("회전 보간 속도 (높을수록 빠르게 회전)")]
     [Range(1f, 20f)]
-    [SerializeField] private float rotationSmoothSpeed = 5f;
-
-    [Header("=== UI 연결 ===")]
-    [Tooltip("정보 표시용 TMP_Text")]
-    [SerializeField] private TMP_Text uiInfoText;
+    [SerializeField] private float rotationSmoothSpeed = 3f;
 
     [Tooltip("SmoothDamp 내부 위치 속도 (읽기 전용)")]
     [SerializeField] private Vector3 currentSmoothVelocity = Vector3.zero;
@@ -31,20 +27,12 @@ public class TPSCamera : MonoBehaviour
         if (target == null)
             return;
         // 타겟 위치에 오프셋을 더한 목표 위치 계산
-        Vector3 targetPosition = target.position + offset;
+        Vector3 targetPosition = target.position + target.TransformDirection(offset);
         // SmoothDamp로 현재 위치에서 목표 위치로 부드럽게 이동
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentSmoothVelocity, positionSmoothTime);
         // 타겟을 향하도록 회전 (회전 보간)
         Quaternion targetRotation = Quaternion.LookRotation(target.position - transform.position);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothSpeed * Time.deltaTime);
-        // UI 정보 업데이트
-        if (uiInfoText != null)
-        {
-            uiInfoText.text = $"Camera Position: {transform.position}\n" +
-                              $"Target Position: {target.position}\n" +
-                              $"Current Smooth Velocity: {currentSmoothVelocity}";
-        }
-
     }
 
 }
